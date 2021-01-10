@@ -8,3 +8,13 @@ func ParseLine(line string) (match []string) {
 	match = logRegex.FindStringSubmatch(line)
 	return
 }
+
+func IntFlagIsValid(intFlag int) bool {
+	if intFlag > 10000 {
+		return false
+	}
+	if intFlag < 0 {
+		return false
+	}
+	return true
+}

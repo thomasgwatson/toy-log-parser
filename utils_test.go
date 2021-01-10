@@ -55,6 +55,30 @@ func TestParser(t *testing.T) {
 	})
 }
 
+func TestIntFlagValidation(t *testing.T) {
+	t.Run("valid flag is valid", func(t *testing.T){
+		got := IntFlagIsValid(2)
+		if !got {
+			t.Errorf("Expected flag to be valid and true, got false")
+		}
+	})
+
+	t.Run("negative out of range int flag returns as invalid", func(t *testing.T){
+		got := IntFlagIsValid(-234)
+		if got {
+			t.Errorf("Expected flag to be invalid and false, got true")
+		}
+	})
+
+	t.Run("positive out of range flag returns as invalid", func(t *testing.T){
+		got := IntFlagIsValid(23400)
+		if got {
+			t.Errorf("Expected flag to be invalid and false, got true")
+		}
+	})
+}
+
+
 func assertStringEquality(t *testing.T, got, want string) {
 	t.Helper()
 	if got != want {
