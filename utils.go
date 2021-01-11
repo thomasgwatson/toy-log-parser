@@ -141,7 +141,7 @@ type PairListFloat []PairFloat
 
 func (p PairListFloat) Len() int           { return len(p) }
 func (p PairListFloat) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
-func (p PairListFloat) Less(i, j int) bool { return p[i].Value > p[j].Value }
+func (p PairListFloat) Less(i, j int) bool { return p[i].Value < p[j].Value }
 
 func transformTopPathAvgSeconds(input TopPathAvgSeconds, maxPathsFlag int) *orderedmap.OrderedMap {
 	pairList := make(PairListFloat, len(input))
