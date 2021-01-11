@@ -1,8 +1,12 @@
 package main
 
 import (
+	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
+	"log"
+	"os"
 )
 
 var inFlag string
@@ -13,16 +17,22 @@ var maxPathsFlag int
 func init() {
 	flag.StringVar(&inFlag, "in", "log.txt", "input text file name")
 	flag.StringVar(&outFlag, "out", "results.json", "output json file name")
-	flag.IntVar(&maxClientIpsFlag, "max-client-ips", 10, "integer that defines the maximum number of results to output in the top_client_ips field")
-	flag.IntVar(&maxPathsFlag, "max-paths", 10, "integer that defines the max number of results to output on the top_path_avg_seconds field.")
+	flag.IntVar(&maxClientIpsFlag, "max-client-ips", 2, "integer that defines the maximum number of results to output in the top_client_ips field")
+	flag.IntVar(&maxPathsFlag, "max-paths", 2, "integer that defines the max number of results to output on the top_path_avg_seconds field.")
 }
 
 func main() {
 	flag.Parse()
-	//setup output struct
-	//read flags
 
-	//read in file, line by line bufio.Scanner
+	if !IntFlagIsValid(maxPathsFlag) || !IntFlagIsValid(maxClientIpsFlag) {
+		fmt.Println("Flags invalid")
+		os.Exit(1)
+	}
+
+	// setup output struct
+	// read flags
+
+	// read in file, line by line bufio.Scanner
 
 	// -in string
 	// -out string
@@ -31,14 +41,53 @@ func main() {
 	// Read given file or from STDIN
 	// var logReader io.Reader
 	// var err error
-	// logReader = strings.NewReader(`89.234.89.123 [08/Nov/2013:13:39:18 +0000] "GET /api/foo/bar HTTP/1.1" 200`)
-	// logReader = strings.NewReader(`89.234.89.123 [08/Nov/2013:13:39:18 +0000] "GET /api/foo/bar HTTP/1.1" 200 1531 "Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:24.0) Gecko/20100101 Firefox/24.0"`)
-	// logReader = strings.NewReader(`89.234.89.123 [08/Nov/2013:13:39:18 +0000] "GET /api/foo/bar HTTP/1.1"`)
-	// logReader = strings.NewReader(`89.234.89.123 [08/Nov/2013:13:39:18 +0000] "GET /api/foo/bar HTTP/1.1"`)
-	// Use nginx config file to extract format by the name
 
 	// Read from STDIN and use log_format to parse log records
 
-	fmt.Println(inFlag)
-	fmt.Println(outFlag)
+	file, errFile := os.Open(inFlag)
+
+	if errFile != nil {
+		fmt.Println("file wouldn't open")
+		os.Exit(1)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	var matches Matches
+
+	for scanner.Scan() {
+		match := ParseLine(scanner.Text())
+		if match == nil {
+			failed := []string{}
+			matches = append(matches, failed)
+		} else {
+			matches = append(matches, match)
+		}
+	}
+
+	results := CompileResults(matches)
+	// sort/trim results and port to JSON
+	// write to file
+	transformedResults := TransformResults(results, maxClientIpsFlag, maxPathsFlag)
+
+	// Looking pretty good to here
+	// - Need to figure out an efficient way to port the Pair structs into JSONable format
+	// - Then I need to marshall into JSON and file to file
+	
+	json_representation, errJson := json.Marshal(transformedResults)
+
+	fmt.Println(string(json_representation))
+
+	if errJson != nil {
+
+		log.Fatal(errJson)
+}
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	// fmt.Println(inFlag)
+	// fmt.Println(outFlag)
 }
