@@ -64,7 +64,7 @@ func main() {
 	// sort/trim results and port to JSON
 	transformedResults := TransformResults(results, maxClientIpsFlag, maxPathsFlag)
 	json_representation, errJson := json.MarshalIndent(transformedResults, "", " ")
-	
+
 	if errJson != nil {
 		log.Fatal(errJson)
 	}

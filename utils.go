@@ -6,11 +6,13 @@ import (
 	"regexp"
 	"sort"
 	"strconv"
+
+	"github.com/iancoleman/orderedmap"
 )
 
 func ParseLine(line string) (match []string) {
 	var logRegex = regexp.MustCompile(`^(\S+)[\s-]-\s\S+\s\[[^][]*]\s"\S+\s([^\?\s]*)\?*\S*\s[^"]+"\s\d{3}\s(\d+)\s"[^"]+"\s{0,1}.*`)
-	// regex workspace https://regex101.com/r/I7EPUI/3
+	// regex workspace https://regex101.com/r/I7EPUI/5
 	match = logRegex.FindStringSubmatch(line)
 	return
 }
@@ -99,14 +101,12 @@ func updateTopPathAvgSeconds(topPathAvgSeconds TopPathAvgSeconds, path string, r
 	}
 }
 
-type TopPathAvgReponseOutput map[string]int
-
 type TransformedResults struct {
-	TotalNumberOfLinesProcessed int                `json:"total_number_of_lines_processed"`
-	TotalNumberOfLinesOk        int                `json:"total_number_of_lines_ok"`
-	TotalNumberOfLinesFailed    int                `json:"total_number_of_lines_failed"`
-	TopClientIps                map[string]int     `json:"top_client_ips"`
-	TopPathAvgSeconds           map[string]float64 `json:"top_path_avg_seconds"`
+	TotalNumberOfLinesProcessed int                    `json:"total_number_of_lines_processed"`
+	TotalNumberOfLinesOk        int                    `json:"total_number_of_lines_ok"`
+	TotalNumberOfLinesFailed    int                    `json:"total_number_of_lines_failed"`
+	TopClientIps                *orderedmap.OrderedMap `json:"top_client_ips"`
+	TopPathAvgSeconds           *orderedmap.OrderedMap `json:"top_path_avg_seconds"`
 }
 
 func TransformResults(results Results, maxClientIpsFlag, maxPathsFlag int) TransformedResults {
@@ -144,7 +144,7 @@ func (p PairListFloat) Len() int           { return len(p) }
 func (p PairListFloat) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 func (p PairListFloat) Less(i, j int) bool { return p[i].Value > p[j].Value }
 
-func transformTopPathAvgSeconds(input TopPathAvgSeconds, maxPathsFlag int) map[string]float64 {
+func transformTopPathAvgSeconds(input TopPathAvgSeconds, maxPathsFlag int) *orderedmap.OrderedMap {
 	pairList := make(PairListFloat, len(input))
 
 	i := 0
@@ -154,21 +154,21 @@ func transformTopPathAvgSeconds(input TopPathAvgSeconds, maxPathsFlag int) map[s
 	}
 
 	sort.Sort(pairList)
-	
+
 	fmt.Print(pairList)
 	if len(pairList) > maxPathsFlag {
 		pairList = pairList[:maxPathsFlag]
 	}
 	fmt.Print(pairList)
-	backToMap := map[string]float64{}
+	backToMap := orderedmap.New()
 	for _, pair := range pairList {
-		backToMap[pair.Key] = pair.Value
+		backToMap.Set(pair.Key, pair.Value)
 	}
 
 	return backToMap
 }
 
-func transformTopClientIps(input TopClientIps, maxClientIpsFlag int) map[string]int {
+func transformTopClientIps(input TopClientIps, maxClientIpsFlag int) *orderedmap.OrderedMap {
 	pairList := make(PairListInt, len(input))
 
 	i := 0
@@ -182,9 +182,9 @@ func transformTopClientIps(input TopClientIps, maxClientIpsFlag int) map[string]
 		pairList = pairList[:maxClientIpsFlag]
 	}
 
-	backToMap := map[string]int{}
+	backToMap := orderedmap.New()
 	for _, pair := range pairList {
-		backToMap[pair.Key] = pair.Value
+		backToMap.Set(pair.Key, pair.Value)
 	}
 
 	return backToMap
