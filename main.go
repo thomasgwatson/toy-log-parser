@@ -49,6 +49,7 @@ func main() {
 		match := ParseLine(scanner.Text())
 		if match == nil {
 			failed := []string{}
+			fmt.Println(scanner.Text())
 			matches = append(matches, failed) // done for type consistency
 		} else {
 			matches = append(matches, match)
