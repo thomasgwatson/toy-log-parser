@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 	"regexp"
 	"sort"
@@ -156,7 +157,7 @@ func transformTopPathAvgSeconds(input TopPathAvgSeconds, maxPathsFlag int) map[s
 	if len(pairList) > maxPathsFlag {
 		pairList = pairList[:maxPathsFlag]
 	}
-
+	fmt.Print(pairList)
 	backToMap := map[string]float64{}
 	for _, pair := range pairList {
 		backToMap[pair.Key] = pair.Value
@@ -178,7 +179,7 @@ func transformTopClientIps(input TopClientIps, maxClientIpsFlag int) map[string]
 	if len(pairList) > maxClientIpsFlag {
 		pairList = pairList[:maxClientIpsFlag]
 	}
-	
+
 	backToMap := map[string]int{}
 	for _, pair := range pairList {
 		backToMap[pair.Key] = pair.Value
