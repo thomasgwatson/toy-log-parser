@@ -154,6 +154,8 @@ func transformTopPathAvgSeconds(input TopPathAvgSeconds, maxPathsFlag int) map[s
 	}
 
 	sort.Sort(pairList)
+	
+	fmt.Print(pairList)
 	if len(pairList) > maxPathsFlag {
 		pairList = pairList[:maxPathsFlag]
 	}
