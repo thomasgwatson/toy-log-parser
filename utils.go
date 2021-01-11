@@ -155,11 +155,9 @@ func transformTopPathAvgSeconds(input TopPathAvgSeconds, maxPathsFlag int) *orde
 
 	sort.Sort(pairList)
 
-	fmt.Print(pairList)
 	if len(pairList) > maxPathsFlag {
 		pairList = pairList[:maxPathsFlag]
 	}
-	fmt.Print(pairList)
 	backToMap := orderedmap.New()
 	for _, pair := range pairList {
 		backToMap.Set(pair.Key, pair.Value)
