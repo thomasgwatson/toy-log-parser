@@ -9,7 +9,7 @@ import (
 
 func ParseLine(line string) (match []string) {
 	var logRegex = regexp.MustCompile(`^(\S+)[\s-]-\s\S+\s\[[^][]*]\s"\S+\s(/[^\?\s]*)\?*\S*\s[^"]+"\s\d{3}\s(\d+)\s"([^"]+)"`)
-	//regex workspace https://regex101.com/r/I7EPUI/3
+	// regex workspace https://regex101.com/r/I7EPUI/3
 	match = logRegex.FindStringSubmatch(line)
 	return
 }
@@ -101,11 +101,11 @@ func updateTopPathAvgSeconds(topPathAvgSeconds TopPathAvgSeconds, path string, r
 type TopPathAvgReponseOutput map[string]int
 
 type TransformedResults struct {
-	TotalNumberOfLinesProcessed int           `json:"total_number_of_lines_processed"`
-	TotalNumberOfLinesOk        int           `json:"total_number_of_lines_ok"`
-	TotalNumberOfLinesFailed    int           `json:"total_number_of_lines_failed"`
-	TopClientIps                PairListInt   `json:"top_client_ips"`
-	TopPathAvgSeconds           PairListFloat `json:"top_path_avg_seconds"`
+	TotalNumberOfLinesProcessed int                `json:"total_number_of_lines_processed"`
+	TotalNumberOfLinesOk        int                `json:"total_number_of_lines_ok"`
+	TotalNumberOfLinesFailed    int                `json:"total_number_of_lines_failed"`
+	TopClientIps                map[string]int     `json:"top_client_ips"`
+	TopPathAvgSeconds           map[string]float64 `json:"top_path_avg_seconds"`
 }
 
 func TransformResults(results Results, maxClientIpsFlag, maxPathsFlag int) TransformedResults {
@@ -143,12 +143,12 @@ func (p PairListFloat) Len() int           { return len(p) }
 func (p PairListFloat) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 func (p PairListFloat) Less(i, j int) bool { return p[i].Value > p[j].Value }
 
-func transformTopPathAvgSeconds(input TopPathAvgSeconds, maxPathsFlag int) PairListFloat {
+func transformTopPathAvgSeconds(input TopPathAvgSeconds, maxPathsFlag int) map[string]float64 {
 	pairList := make(PairListFloat, len(input))
 
 	i := 0
 	for k, v := range input {
-		pairList[i] = PairFloat{k, round(v.AverageResponseTime())}
+		pairList[i] = PairFloat{k, toFixed(v.AverageResponseTime(), 2)}
 		i++
 	}
 
@@ -156,10 +156,16 @@ func transformTopPathAvgSeconds(input TopPathAvgSeconds, maxPathsFlag int) PairL
 	if len(pairList) > maxPathsFlag {
 		pairList = pairList[:maxPathsFlag]
 	}
-	return pairList
+
+	backToMap := map[string]float64{}
+	for _, pair := range pairList {
+		backToMap[pair.Key] = pair.Value
+	}
+
+	return backToMap
 }
 
-func transformTopClientIps(input TopClientIps, maxClientIpsFlag int) PairListInt {
+func transformTopClientIps(input TopClientIps, maxClientIpsFlag int) map[string]int {
 	pairList := make(PairListInt, len(input))
 
 	i := 0
@@ -172,9 +178,20 @@ func transformTopClientIps(input TopClientIps, maxClientIpsFlag int) PairListInt
 	if len(pairList) > maxClientIpsFlag {
 		pairList = pairList[:maxClientIpsFlag]
 	}
-	return pairList
+	
+	backToMap := map[string]int{}
+	for _, pair := range pairList {
+		backToMap[pair.Key] = pair.Value
+	}
+
+	return backToMap
 }
 
-func round(n float64) float64 {
-	return math.Round(n*100) / 100
+func round(num float64) int {
+	return int(num + math.Copysign(0.5, num))
+}
+
+func toFixed(num float64, precision int) float64 {
+	output := math.Pow(10, float64(precision))
+	return float64(round(num*output)) / output
 }
