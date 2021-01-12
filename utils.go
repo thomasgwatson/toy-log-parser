@@ -69,11 +69,10 @@ func CompileResults(matches Matches) Results {
 			results.TotalNumberOfLinesFailed += 1
 			continue
 		}
-
+		results.TotalNumberOfLinesOk += 1
 		ipAddress := matchSeries[1]
 		path := matchSeries[2]
 		responseTime, _ := strconv.Atoi(matchSeries[3])
-		results.TotalNumberOfLinesOk += 1
 		updateTopClientIps(results.TopClientIps, ipAddress)
 		updateTopPathAvgSeconds(results.TopPathAvgSeconds, path, responseTime)
 	}
