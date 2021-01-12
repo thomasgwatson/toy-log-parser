@@ -24,7 +24,7 @@ func init() {
 
 func main() {
 	flag.Parse()
-
+	fmt.Print(maxClientIpsFlag, maxPathsFlag)
 	// validate intFlags
 	if !IntFlagIsValid(maxPathsFlag) || !IntFlagIsValid(maxClientIpsFlag) {
 		fmt.Println("Flags invalid")
