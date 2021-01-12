@@ -17,7 +17,7 @@ var cases = []Case{
 	{`51.232.15.21 - markp [14/Jul/2009:03:35:00 +0000] "GET /product/catalog?item=fe23acd HTTP/1.1" 200 649 "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9a1) Gecko/20070308 Minefield/3.0a1"`, `51.232.15.21`, `/product/catalog`, `649`},
 	{`92.177.30.4 - - [09/Dec/2010:15:43:00 +0000] "POST /product/cart HTTP/1.1" 200 1198 "Mozilla/5.0 (X11; Datanyze; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36"`, `92.177.30.4`, `/product/cart`, `1198`},
 	{`112.21.100.55 - root [22/May/2012:07:44:38 +0000] "GET /admin.php HTTP/1.1" 404 50 "python-requests/2.21.0"`, `112.21.100.55`, `/admin.php`, `50`},
-	{`actuallybadbutpasses - - [doesntmatter] "SOMEWORD /kind/of/valid/url?anything somethinghere" 999 1234 "literallyany text you like"`, `actuallybadbutpasses`, `/kind/of/valid/url`, `1234`},
+	{`112.21.100.55 - - [doesntmatter] "SOMEWORD /kind/of/valid/url?anything somethinghere" 999 1234 "literallyany text you like"`, `112.21.100.55`, `/kind/of/valid/url`, `1234`},
 	{`3.112.21.21 - root [06/Jun/2020:02:24:12 +0000] "HEAD %5C%22%3Bdrop%20table%20users%3B%20select%5C%22 HTTP/1.1" 404 5503 "Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)"`, `3.112.21.21`, `%5C%22%3Bdrop%20table%20users%3B%20select%5C%22`, `5503`},
 }
 
@@ -30,11 +30,10 @@ var badCases = []string{
 
 var topClientIps = TopClientIps{
 	`3.112.21.21`: 1,
-	`actuallybadbutpasses`: 1,
 	`34.149.47.34`:  1,
 	`51.232.15.21`:  1,
 	`92.177.30.4`:   1,
-	`112.21.100.55`: 1,
+	`112.21.100.55`: 2,
 }
 var topPathAvgSeconds = TopPathAvgSeconds{
 	`%5C%22%3Bdrop%20table%20users%3B%20select%5C%22`: TopPathRecord{1, 5503},

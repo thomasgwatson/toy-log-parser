@@ -70,16 +70,27 @@ func CompileResults(matches Matches) Results {
 			results.TotalNumberOfLinesFailed += 1
 			continue
 		}
-		
 		ipAddress := matchSeries[1]
 		path := matchSeries[2]
 		responseTime, _ := strconv.Atoi(matchSeries[3])
+
+		if !validIpAddress(ipAddress) {
+			results.TotalNumberOfLinesFailed += 1
+			continue
+		}
+
 		updateTopClientIps(results.TopClientIps, ipAddress)
 		updateTopPathAvgSeconds(results.TopPathAvgSeconds, path, responseTime)
 		results.TotalNumberOfLinesOk += 1
 	}
 
 	return results
+}
+
+func validIpAddress(ipAddress string) bool {
+	var ipAddressRegex = regexp.MustCompile(`^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$`)
+	match := ipAddressRegex.FindStringSubmatch(ipAddress)
+	return match != nil
 }
 
 func updateTopClientIps(topClientIps TopClientIps, ipAddress string) {
