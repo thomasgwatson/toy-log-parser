@@ -10,7 +10,8 @@ import (
 )
 
 func ParseLine(line string) (match []string) {
-	var logRegex = regexp.MustCompile(`^(\S+)[\s-]-\s\S+\s\[[^][]*]\s"\S+\s([^\?\s]*)\?*\S*\s[^"]+"\s\d{3}\s(\d+)\s"[^"]+"\s{0,1}.*`)
+	var logRegex = regexp.MustCompile(`^(\S+)[\s-]-\s\S+\s\[[^][]*]\s"\S+\s([^\?\s]*)\?*\S*\s[^"]+"\s\d{3}\s(\d+)\s"[^"]+"`)
+	// \s{0,1}.*
 	// regex workspace https://regex101.com/r/I7EPUI/5
 	match = logRegex.FindStringSubmatch(line)
 	return
@@ -69,12 +70,13 @@ func CompileResults(matches Matches) Results {
 			results.TotalNumberOfLinesFailed += 1
 			continue
 		}
-		results.TotalNumberOfLinesOk += 1
+		
 		ipAddress := matchSeries[1]
 		path := matchSeries[2]
 		responseTime, _ := strconv.Atoi(matchSeries[3])
 		updateTopClientIps(results.TopClientIps, ipAddress)
 		updateTopPathAvgSeconds(results.TopPathAvgSeconds, path, responseTime)
+		results.TotalNumberOfLinesOk += 1
 	}
 
 	return results
