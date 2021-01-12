@@ -141,14 +141,14 @@ type PairListFloat []PairFloat
 
 func (p PairListFloat) Len() int           { return len(p) }
 func (p PairListFloat) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
-func (p PairListFloat) Less(i, j int) bool { return p[i].Value < p[j].Value }
+func (p PairListFloat) Less(i, j int) bool { return p[i].Value > p[j].Value }
 
 func transformTopPathAvgSeconds(input TopPathAvgSeconds, maxPathsFlag int) *orderedmap.OrderedMap {
 	pairList := make(PairListFloat, len(input))
 
 	i := 0
 	for k, v := range input {
-		pairList[i] = PairFloat{k, toFixed(v.AverageResponseTime(), 2)}
+		pairList[i] = PairFloat{k, v.AverageResponseTime()}
 		i++
 	}
 
@@ -159,7 +159,7 @@ func transformTopPathAvgSeconds(input TopPathAvgSeconds, maxPathsFlag int) *orde
 	}
 	backToMap := orderedmap.New()
 	for _, pair := range pairList {
-		backToMap.Set(pair.Key, pair.Value)
+		backToMap.Set(pair.Key, toFixed(pair.Value/1000, 2))
 	}
 
 	return backToMap
