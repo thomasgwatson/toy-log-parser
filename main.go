@@ -47,7 +47,6 @@ func main() {
 	var matches Matches
 	for scanner.Scan() {
 		match := ParseLine(scanner.Text())
-		fmt.Println(scanner.Text())
 		if match == nil {
 			failed := []string{}
 			matches = append(matches, failed) // done for type consistency
