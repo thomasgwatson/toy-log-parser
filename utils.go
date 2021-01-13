@@ -10,7 +10,7 @@ import (
 )
 
 func ParseLine(line string) (match []string) {
-	var logRegex = regexp.MustCompile(`^(\S+)[\s-]-\s\S+\s\[[^][]*]\s"\S+\s([^\?\s]*)\?*\S*\s[^"]+"\s\d{3}\s(\d+)\s"[^"]+"`)
+	var logRegex = regexp.MustCompile(`^(\S+)[\s-]-\s\S+\s\[([^][]*)]\s"(\S+)\s([^\?\s]*)\?*\S*\s[^"]+"\s\d{3}\s(\d+)\s"([^"]+)"`)
 	// \s{0,1}.*
 	// regex workspace https://regex101.com/r/I7EPUI/5
 	match = logRegex.FindStringSubmatch(line)
@@ -66,18 +66,14 @@ func CompileResults(matches Matches) Results {
 
 	for _, matchSeries := range matches {
 		results.TotalNumberOfLinesProcessed += 1
-		if len(matchSeries) == 0 {
+		if len(matchSeries) == 0 || !validateMatches(matchSeries) {
 			results.TotalNumberOfLinesFailed += 1
 			continue
 		}
-		ipAddress := matchSeries[1]
-		path := matchSeries[2]
-		responseTime, _ := strconv.Atoi(matchSeries[3])
 
-		if !validIpAddress(ipAddress) {
-			results.TotalNumberOfLinesFailed += 1
-			continue
-		}
+		ipAddress := matchSeries[1]
+		path := matchSeries[4]
+		responseTime, _ := strconv.Atoi(matchSeries[5])
 
 		updateTopClientIps(results.TopClientIps, ipAddress)
 		updateTopPathAvgSeconds(results.TopPathAvgSeconds, path, responseTime)
@@ -87,10 +83,14 @@ func CompileResults(matches Matches) Results {
 	return results
 }
 
-func validIpAddress(ipAddress string) bool {
-	var ipAddressRegex = regexp.MustCompile(`^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$`)
-	match := ipAddressRegex.FindStringSubmatch(ipAddress)
-	return match != nil
+func validateMatches(matchSeries []string) bool {
+	if !validIpAddress(matchSeries[1]) ||
+		!validDateTime(matchSeries[2]) ||
+		!validHttpVerb(matchSeries[3]) ||
+		!validHttpVersion(matchSeries[5]) {
+		return false
+	}
+	return true
 }
 
 func updateTopClientIps(topClientIps TopClientIps, ipAddress string) {
@@ -206,4 +206,54 @@ func round(num float64) int {
 func toFixed(num float64, precision int) float64 {
 	output := math.Pow(10, float64(precision))
 	return float64(round(num*output)) / output
+}
+
+func validIpAddress(ipAddress string) bool {
+	var ipAddressRegex = regexp.MustCompile(`^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$`)
+	match := ipAddressRegex.FindStringSubmatch(ipAddress)
+	return match != nil
+}
+
+func validDateTime(dateTime string) bool {
+	// var dateTimeRegex = regexp.MustCompile(``)
+	// match := dateTimeRegex.FindStringSubmatch(dateTime)
+	// return match != nil
+	return true
+}
+
+func validHttpVerb(httpVerb string) bool {
+	var httpVerbs = []string{
+		`OPTIONS`,
+		`GET`,
+		`HEAD`,
+		`POST`,
+		`PUT`,
+		`DELETE`,
+		`TRACE`,
+		`CONNECT`,
+	}
+	return contains(httpVerbs, httpVerb)
+}
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
+func validHttpVersion(httpVersion string) bool {
+	// var regex = regexp.MustCompile(``)
+	// match := regex.FindStringSubmatch(httpVersion)
+	// return match != nil
+	return true
+}
+
+func validUserAgent(userAgent string) bool {
+	// var regex = regexp.MustCompile(``)
+	// match := regex.FindStringSubmatch(userAgent)
+	// return match != nil
+	return true
 }
