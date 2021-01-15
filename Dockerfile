@@ -1,9 +1,5 @@
 # hadolint ignore=DL3007
 
-# COPY solution-sample.sh /usr/bin/solution-sample.sh
-
-# RUN chmod +x /usr/bin/solution-sample.sh
-
 FROM golang:alpine
 
 # Set necessary environmet variables needed for our image
