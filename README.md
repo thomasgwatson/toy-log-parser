@@ -1,6 +1,10 @@
 # Log Parsing
 
-Welcome!
+This is a toy log parser, for nginx access logs, written in Go.
+
+- Run the tests? `go test`
+- Run the program? `go run main.go utils.go` with the appropriate arguments and input files (example available in the exampleData folder)
+- You want to run it on docker? `docker build -t="log-parser" .` and then (for example) `docker run -t -i log-parser --in=my-special-log-file.txt --out results-2021-01-15.json`
 
 You will be providing technical assistance to `Chunkfred`, a well positioned
 Software as a Service company that provides insights around their clients'
