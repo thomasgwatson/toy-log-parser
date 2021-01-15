@@ -11,7 +11,6 @@ import (
 
 func ParseLine(line string) (match []string) {
 	var logRegex = regexp.MustCompile(`^(\S+)[\s-]-\s\S+\s\[([^][]*)]\s"(\S+)\s([^\?\s]*)\?*\S*\s[^"]+"\s\d{3}\s(\d+)\s"([^"]+)"`)
-	// \s{0,1}.*
 	// regex workspace https://regex101.com/r/I7EPUI/5
 	match = logRegex.FindStringSubmatch(line)
 	return
@@ -47,8 +46,8 @@ func (t *TopPathRecord) AverageResponseTime() float64 {
 	return float64(t.culminativeResponseTime) / float64(t.requests)
 }
 
-type TopClientIps map[string]int
-type TopPathAvgSeconds map[string]TopPathRecord
+type TopClientIps map[string]int // Refractor: streamline the structure of this data, to avoid so many format changes
+type TopPathAvgSeconds map[string]TopPathRecord // Refractor: streamline the structure of this data, to avoid so many format changes
 type Matches [][]string
 
 type Results struct {
@@ -74,21 +73,22 @@ func CompileResults(matches Matches) Results {
 		ipAddress := matchSeries[1]
 		path := matchSeries[4]
 		responseTime, _ := strconv.Atoi(matchSeries[5])
-
-		updateTopClientIps(results.TopClientIps, ipAddress)
-		updateTopPathAvgSeconds(results.TopPathAvgSeconds, path, responseTime)
+		
+		updateTopClientIps(results.TopClientIps, ipAddress) // Refractor: streamline the structure of this data, to avoid so many format changes
+		updateTopPathAvgSeconds(results.TopPathAvgSeconds, path, responseTime) // Refractor: streamline the structure of this data, to avoid so many format changes
 		results.TotalNumberOfLinesOk += 1
 	}
 
 	return results
 }
 
-func validateMatches(matchSeries []string) bool {
+// A start for how deeper validation of lines could be ensured
+func validateMatches(matchSeries []string) bool { 
 	if !validIpAddress(matchSeries[1]) ||
 		!validDateTime(matchSeries[2]) ||
 		!validHttpVerb(matchSeries[3]) ||
 		!validHttpVersion(matchSeries[5]) {
-		return false
+		return false 
 	}
 	return true
 }

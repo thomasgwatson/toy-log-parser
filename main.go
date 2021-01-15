@@ -1,5 +1,12 @@
 package main
 
+// Thank you for reading my code. As it stands, 'in production' there are possible 'out of memory' concerns
+// And possible invalid lines slipping into the results set.
+// Of course, if this was real-life, I would anticipate that production logging like splunk or honeycomb.io
+// could be used to zero in on these issues. Beyond that, there are numerous possible test-cases one could add
+// to expand the rigor of line validation.
+// I hope you enjoy inspecting this code as much as I did writing it; it is my first program using Go and I am really digging it
+
 import (
 	"bufio"
 	"encoding/json"

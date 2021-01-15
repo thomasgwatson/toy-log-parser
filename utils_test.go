@@ -105,6 +105,8 @@ func TestCompileResults(t *testing.T) {
 	}
 }
 
+// Obviously would want to complete this test in real-life circumstances
+
 // func TestTransformResults(t *testing.T){
 // 	maxClientIpsFlag := 2
 // 	maxPathsFlag := 2
